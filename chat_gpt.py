@@ -16,4 +16,7 @@ class ChatGpt:
 
     def get_answer(self):
         return self.completion['choices'][0]['message']['content']
+    def test(self):
+        pass
+
 
