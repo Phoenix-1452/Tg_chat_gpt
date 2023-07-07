@@ -2,6 +2,8 @@ from aiogram import Bot, Dispatcher, types, executor
 from dotenv import load_dotenv
 import os
 import openai
+from chat_gpt import ChatGpt
+
 
 load_dotenv()
 TELEGRAM_KEY = os.getenv("API_TG_BOT_KEY")
@@ -36,13 +38,17 @@ async def gpt_answer(message: types.Message):
         history[message.from_user.id] = []
     history[message.from_user.id].append({'role': 'user', 'content': message.text})
 
-    completion = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
-        messages=history[message.from_user.id],
-        temperature=0.5
-    )
+    # completion = openai.ChatCompletion.create(
+    #     model='gpt-3.5-turbo',
+    #     messages=history[message.from_user.id],
+    #     temperature=1.0
+    # )
 
-    answer = completion['choices'][0]['message']['content']
+    chat = ChatGpt(history, message)
+    chat.run()
+    answer = chat.get_answer()
+
+    # answer = completion['choices'][0]['message']['content']
     await message.reply(answer)
     await flood.delete()
     history[message.from_user.id].append({'role': 'assistant', 'content': answer})
