@@ -6,7 +6,10 @@ from aiogram.filters import Command
 from dotenv import load_dotenv
 import os
 import openai
+from psycopg2 import IntegrityError
+
 from chat_gpt import ChatGpt
+from models.create_data import registration, buy_vip, prompts, get_history, clear_history
 
 load_dotenv()
 TELEGRAM_KEY = os.getenv("API_TG_BOT_KEY")
@@ -22,40 +25,44 @@ history = {}
 @dp.message(Command("start"))
 async def start_msg(message: types.Message):
     await message.answer("Hello, this is CHAT GPT telegram bot.")
-
-
-@dp.message(Command("history"))
-async def gpt_history(message: types.Message):
-    await message.answer(str(history))
+    user_id = message.from_user.id
+    registration(user_id)
 
 
 @dp.message(Command("clear"))
 async def gpt_history(message: types.Message):
-    history.clear()
+    # history.clear()
+    user_id = message.from_user.id
+    clear_history(user_id)
     await message.answer("History deleted.")
 
 
 @dp.message()
 async def gpt_answer(message: types.Message):
     flood = await message.answer('Generating...')
-    if not (message.from_user.id in history):
-        history[message.from_user.id] = []
-    history[message.from_user.id].append({'role': 'user', 'content': message.text})
+    # if not (message.from_user.id in history):
+    #     history[message.from_user.id] = []
+    #
+    # history[message.from_user.id].append({'role': 'user', 'content': message.text})
+    user_id = message.from_user.id
 
+    prompts(user_id, {'role': 'user', 'content': message.text})
     # completion = openai.ChatCompletion.create(
     #     model='gpt-3.5-turbo',
     #     messages=history[message.from_user.id],
     #     temperature=1.0
     # )
 
-    chat = ChatGpt(history, message)
+    chat = ChatGpt(get_history(user_id), message)
     chat.run()
     answer = chat.get_answer()
 
     # answer = completion['choices'][0]['message']['content']
     await message.reply(answer)
     await flood.delete()
-    history[message.from_user.id].append({'role': 'assistant', 'content': answer})
+    prompts(user_id, {'role': 'assistant', 'content': answer})
+
+    # history[message.from_user.id].append({'role': 'assistant', 'content': answer})
 
 
 async def main():

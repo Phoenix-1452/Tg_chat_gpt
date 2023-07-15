@@ -10,7 +10,7 @@ class ChatGpt:
     def run(self):
         self.completion = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
-            messages=self.history[self.message.from_user.id],
+            messages=self.history,
             temperature=1.0
         )
 
