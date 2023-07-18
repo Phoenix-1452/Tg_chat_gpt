@@ -15,7 +15,7 @@ class User(Base):
     balance = Column(Float, default=0, nullable=False)
     vip = Column(Boolean, default=False, nullable=False)
     vip_days_left = Column(Integer)
-    history = Column(JSON)
+    history = Column(JSON, default=False)
 
 
 

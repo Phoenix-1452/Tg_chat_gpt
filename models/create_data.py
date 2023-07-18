@@ -27,8 +27,6 @@ def buy_vip(user_id, days):
 
 def prompts(user_id, history):
     user = session.query(User).filter_by(user_id=user_id).first()
-    if user.history is None:
-        user.history = []
     user.history = list(user.history)
     user.history.append(history)
     session.commit()
@@ -42,7 +40,7 @@ def get_history(user_id):
 
 def clear_history(user_id):
     user = session.query(User).filter_by(user_id=user_id).first()
-    user.history = None
+    user.history = []
     session.commit()
 
 
