@@ -6,7 +6,6 @@ from aiogram.filters import Command
 from dotenv import load_dotenv
 import os
 import openai
-
 from chat_gpt import ChatGpt
 from models.create_data import registration, buy_vip, prompts, get_history, clear_history
 
@@ -15,7 +14,7 @@ TELEGRAM_KEY = os.getenv("API_TG_BOT_KEY")
 openai.api_key = os.getenv("API_CHAT_GPT_KEY")
 
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=TELEGRAM_KEY, parse_mode="HTML")
+bot = Bot(token=TELEGRAM_KEY)
 dp = Dispatcher()
 
 
@@ -24,6 +23,23 @@ async def start_msg(message: types.Message):
     await message.answer("Hello, this is CHAT GPT telegram bot.")
     user_id = message.from_user.id
     registration(user_id)
+
+
+@dp.message(Command("menu"))
+async def cmd_start(message: types.Message):
+    kb = [
+        [types.KeyboardButton(text="Профиль")],
+        [types.KeyboardButton(text="Магазин")]
+    ]
+    keyboard = types.ReplyKeyboardMarkup(keyboard=kb)
+    await message.answer("Как подавать котлеты?", reply_markup=keyboard)
+
+
+@dp.message(Command("buy_vip"))
+async def start_msg(message: types.Message):
+    user_id = message.from_user.id
+    buy_vip(user_id)
+    await message.answer("OK")
 
 
 @dp.message(Command("clear"))

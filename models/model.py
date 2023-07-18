@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, TIMESTAMP, JSON, Float, ARRAY, TEXT
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, TIMESTAMP, JSON, Float, ARRAY, TEXT, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -14,7 +14,7 @@ class User(Base):
     username = Column(String)
     balance = Column(Float, default=0, nullable=False)
     vip = Column(Boolean, default=False, nullable=False)
-    vip_days_left = Column(Integer)
+    vip_days_left = Column(DateTime)
     history = Column(JSON, default=False)
 
 
