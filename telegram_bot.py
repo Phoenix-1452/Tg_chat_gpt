@@ -17,22 +17,26 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TELEGRAM_KEY)
 dp = Dispatcher()
 
+kb = [
+    [types.KeyboardButton(text="/clear")],
+    [types.KeyboardButton(text="/buy_vip")],
+    [types.KeyboardButton(text="/info")]
 
-@dp.message(Command("start"))
+]
+keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+
+
+@dp.message(Command(commands=["start", "info"]))
 async def start_msg(message: types.Message):
-    await message.answer("Hello, this is CHAT GPT telegram bot.")
+    await message.answer(text="<b>Hello, this is CHAT GPT telegram bot.</b>\n"
+                              "<b>list of bot commands:</b>\n"
+                              "<em>/clear - clear context</em>\n"
+                              "<em>/buy_vip - buy vip status for gpt 4</em>\n"
+                              "<em>/info - information about bot</em>",
+                         reply_markup=keyboard,
+                         parse_mode="HTML")
     user_id = message.from_user.id
     registration(user_id)
-
-
-@dp.message(Command("menu"))
-async def cmd_start(message: types.Message):
-    kb = [
-        [types.KeyboardButton(text="Профиль")],
-        [types.KeyboardButton(text="Магазин")]
-    ]
-    keyboard = types.ReplyKeyboardMarkup(keyboard=kb)
-    await message.answer("Как подавать котлеты?", reply_markup=keyboard)
 
 
 @dp.message(Command("buy_vip"))
@@ -44,7 +48,6 @@ async def start_msg(message: types.Message):
 
 @dp.message(Command("clear"))
 async def gpt_history(message: types.Message):
-    # history.clear()
     user_id = message.from_user.id
     clear_history(user_id)
     await message.answer("History deleted.")
@@ -53,18 +56,21 @@ async def gpt_history(message: types.Message):
 @dp.message()
 async def gpt_answer(message: types.Message):
     flood = await message.answer('Generating...')
-
     user_id = message.from_user.id
 
-    prompts(user_id, {'role': 'user', 'content': message.text})
-
-    chat = ChatGpt(get_history(user_id), message)
-    chat.run()
-    answer = chat.get_answer()
-
-    await message.reply(answer)
-    await flood.delete()
-    prompts(user_id, {'role': 'assistant', 'content': answer})
+    try:
+        prompts(user_id, {'role': 'user', 'content': message.text})
+        chat = ChatGpt(get_history(user_id))
+        chat.run()
+        answer = chat.get_answer()
+        await message.reply(answer)
+        await flood.delete()
+        prompts(user_id, {'role': 'assistant', 'content': answer})
+    except Exception:
+        await flood.delete()
+        await message.answer('Token Limit Exceeded!!!'
+                             'We have deleted the history of your requests, ask your question again')
+        clear_history(user_id)
 
 
 async def main():

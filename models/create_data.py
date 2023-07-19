@@ -21,34 +21,46 @@ def registration(user_id):
 
 
 def buy_vip(user_id):
-    user = session.query(User).filter_by(user_id=user_id).first()
-    user.vip = True
-    current_datetime = date.today()
-    duration = timedelta(days=30)
-    end_datetime = current_datetime + duration
-    end_date_formatted = end_datetime.strftime('%Y-%m-%d')
-    user.vip_days_left = end_date_formatted
-    print(end_date_formatted)
-    session.commit()
+    try:
+        user = session.query(User).filter_by(user_id=user_id).first()
+        user.vip = True
+        current_datetime = date.today()
+        duration = timedelta(days=30)
+        end_datetime = current_datetime + duration
+        end_date_formatted = end_datetime.strftime('%Y-%m-%d')
+        user.vip_days_left = end_date_formatted
+        # print(end_date_formatted)
+        session.commit()
+    except Exception:
+        pass
 
 
 def prompts(user_id, history):
-    user = session.query(User).filter_by(user_id=user_id).first()
-    user.history = list(user.history)
-    user.history.append(history)
-    session.commit()
+    try:
+        user = session.query(User).filter_by(user_id=user_id).first()
+        user.history = list(user.history)
+        user.history.append(history)
+        session.commit()
+    except Exception:
+        pass
 
 
 def get_history(user_id):
-    user = session.query(User).filter_by(user_id=user_id).first()
-    ans = user.history
-    return ans
+    try:
+        user = session.query(User).filter_by(user_id=user_id).first()
+        ans = user.history
+        return ans
+    except Exception:
+        pass
 
 
 def clear_history(user_id):
-    user = session.query(User).filter_by(user_id=user_id).first()
-    user.history = list()
-    session.commit()
+    try:
+        user = session.query(User).filter_by(user_id=user_id).first()
+        user.history = list()
+        session.commit()
+    except Exception:
+        pass
 
 
 session.close()

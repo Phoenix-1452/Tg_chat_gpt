@@ -2,10 +2,9 @@ import openai
 
 
 class ChatGpt:
-    def __init__(self, history, message):
+    def __init__(self, history):
         self.completion = {}
         self.history = history
-        self.message = message
 
     def run(self):
         self.completion = openai.ChatCompletion.create(
